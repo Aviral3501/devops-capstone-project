@@ -1,93 +1,136 @@
 # devops-capstone-project
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.9](https://img.shields.io/badge/Python-3.9-green.svg)](https://shields.io/)
+## Overview
 
+The **DevOps Capstone Project** demonstrates the application of modern DevOps practices to design, build, test, secure, containerize, and deploy a cloud-native microservice.
 
+In this project, a **Customer Accounts microservice** is developed using Python and Flask. The service exposes RESTful APIs that allow users to create, read, update, delete, and list customer account records.
 
-## Usage
+The project follows **Agile development practices** and implements a complete **DevOps lifecycle**, including test-driven development (TDD), continuous integration (CI), containerization, and automated deployment to Kubernetes.
 
-You should use this template to start your DevOps Capstone project. It contains all of the code that you will need to get started.
+## Project Goals
 
-Do Not fork this code! It is meant to be used by pressing the  <span style=color:white;background:green>**Use this Template**</span> button in GitHub. This will copy the code to your own repository with no connection back to the original repository like a fork would. This is what you want.
+The goal of this project is to implement and demonstrate the following DevOps practices:
+
+* Agile project planning using GitHub Issues and a Kanban board
+* Test-Driven Development (TDD) for building REST APIs
+* Continuous Integration using GitHub Actions
+* Code quality checks using Flake8 and code coverage tools
+* Secure coding practices using Flask security extensions
+* Containerization using Docker
+* Deployment to Kubernetes / OpenShift
+* Continuous Delivery pipeline using Tekton
+
+## Microservice Features
+
+The Customer Accounts microservice provides the following functionality:
+
+* Create a new customer account
+* Retrieve account details
+* Update existing account information
+* Delete a customer account
+* List all customer accounts
+
+## Technology Stack
+
+The following technologies are used in this project:
+
+* **Python 3.9**
+* **Flask**
+* **PostgreSQL**
+* **Docker**
+* **Kubernetes / OpenShift**
+* **GitHub Actions**
+* **Tekton Pipelines**
+* **Flake8**
+* **Nose Tests**
+* **Coverage**
+
+## Project Structure
+
+The project follows the **Model-View-Controller (MVC)** design pattern.
+
+```
+service/
+│
+├── common/          # Common logging and error handlers
+├── config.py        # Flask configuration
+├── models.py        # Database models and business logic
+└── routes.py        # REST API routes
+
+tests/
+├── factories.py
+├── test_cli_commands.py
+├── test_models.py
+└── test_routes.py
+```
 
 ## Development Environment
 
-These labs are designed to be executed in the IBM Developer Skills Network Cloud IDE with OpenShift. Please use the links provided in the Coursera Capstone project to access the lab environment.
+This project is designed to run in the **IBM Developer Skills Network Cloud IDE with OpenShift**.
 
-Once you are in the lab environment, you can initialize it with `bin/setup.sh` by sourcing it. (*Note: DO NOT run this program as a bash script. It sets environment variable and so must be sourced*):
+To initialize the development environment:
 
 ```bash
 source bin/setup.sh
 ```
 
-This will install Python 3.9, make it the default, modify the bash prompt, create a Python virtual environment and activate it.
+This script will:
 
-After sourcing it you prompt should look like this:
+* Install Python 3.9
+* Configure a virtual environment
+* Install required dependencies
 
-```bash
+After setup, your prompt should look like:
+
+```
 (venv) theia:project$
 ```
 
-## Useful commands
+## Useful Commands
 
-Under normal circumstances you should not have to run these commands. They are performed automatically at setup but may be useful when things go wrong:
-
-### Activate the Python 3.9 virtual environment
-
-You can activate the Python 3.9 environment with:
+### Activate the Python Virtual Environment
 
 ```bash
 source ~/venv/bin/activate
 ```
 
-### Installing Python dependencies
-
-These dependencies are installed as part of the setup process but should you need to install them again, first make sure that the Python 3.9 virtual environment is activated and then use the `make install` command:
+### Install Project Dependencies
 
 ```bash
 make install
 ```
 
-### Starting the Postgres Docker container
-
-The labs use Postgres running in a Docker container. If for some reason the service is not available you can start it with:
+### Start PostgreSQL Docker Container
 
 ```bash
 make db
 ```
 
-You can use the `docker ps` command to make sure that postgres is up and running.
+Verify that the container is running:
 
-## Project layout
-
-The code for the microservice is contained in the `service` package. All of the test are in the `tests` folder. The code follows the **Model-View-Controller** pattern with all of the database code and business logic in the model (`models.py`), and all of the RESTful routing on the controller (`routes.py`).
-
-```text
-├── service         <- microservice package
-│   ├── common/     <- common log and error handlers
-│   ├── config.py   <- Flask configuration object
-│   ├── models.py   <- code for the persistent model
-│   └── routes.py   <- code for the REST API routes
-├── setup.cfg       <- tools setup config
-└── tests                       <- folder for all of the tests
-    ├── factories.py            <- test factories
-    ├── test_cli_commands.py    <- CLI tests
-    ├── test_models.py          <- model unit tests
-    └── test_routes.py          <- route unit tests
+```bash
+docker ps
 ```
 
-## Data Model
+## Testing
 
-The Account model contains the following fields:
+The project uses **nose tests** and **coverage** to ensure code quality.
 
-| Name | Type | Optional |
-|------|------|----------|
-| id | Integer| False |
-| name | String(64) | False |
-| email | String(64) | False |
-| address | String(256) | False |
-| phone_number | String(32) | True |
-| date_joined | Date | False |
+Run tests with:
 
+```bash
+nosetests
+```
 
+Check test coverage:
+
+```bash
+coverage report
+```
+
+The project maintains **at least 95% test coverage**.
+
+## License
+
+This project is developed as part of the **IBM DevOps Professional Certificate Capstone Project**.
