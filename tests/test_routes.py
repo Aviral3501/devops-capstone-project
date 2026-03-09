@@ -12,14 +12,20 @@ from unittest.mock import patch
 from unittest import TestCase
 from tests.factories import AccountFactory
 from service.common import status  # HTTP Status Codes
+from service.common.cli_commands import db_create
 from service.models import db, Account, init_db
 from service.routes import app
+from service import talisman
+
+
 
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/postgres"
 )
 
 BASE_URL = "/accounts" 
+
+HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 
 
 ######################################################################
@@ -35,6 +41,7 @@ class TestAccountService(TestCase):
         app.config["DEBUG"] = False
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
+        talisman.force_https = False
         init_db(app)
 
     @classmethod
@@ -208,3 +215,91 @@ class TestAccountService(TestCase):
         self.assertIn("postgresql://", config.DATABASE_URI)
         self.assertIn("testuser", config.DATABASE_URI)
         self.assertIn("testdb", config.DATABASE_URI)
+
+    def test_security_headers(self):
+        """It should return security headers"""
+        resp = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(resp.headers.get("X-Frame-Options"), "SAMEORIGIN")
+        self.assertEqual(resp.headers.get("X-Content-Type-Options"), "nosniff")
+        self.assertEqual(
+            resp.headers.get("Content-Security-Policy"),
+            "default-src 'self'; object-src 'none'"
+        )
+        self.assertEqual(
+            resp.headers.get("Referrer-Policy"),
+            "strict-origin-when-cross-origin"
+        )
+
+    def test_db_create_command(self):
+        """It should run the db-create CLI command"""
+
+        runner = app.test_cli_runner()
+
+        with patch("service.common.cli_commands.db") as mock_db:
+            result = runner.invoke(args=["db-create"])
+
+            self.assertEqual(result.exit_code, 0)
+            mock_db.drop_all.assert_called_once()
+            mock_db.create_all.assert_called_once()
+            mock_db.session.commit.assert_called_once()
+
+    def test_persistent_base_init(self):
+        """It should initialize PersistentBase with id None"""
+        from service.models import PersistentBase
+
+        obj = PersistentBase()
+        self.assertIsNone(obj.id)
+
+    def test_account_repr(self):
+        """It should return a string representation of the Account"""
+        account = AccountFactory()
+        account.id = 1
+
+        result = repr(account)
+
+        self.assertIn("Account", result)
+        self.assertIn(account.name, result)
+
+    def test_deserialize_without_date(self):
+        """It should set date_joined to today if missing"""
+        account = Account()
+
+        data = {
+            "name": "Bob",
+            "email": "bob@test.com",
+            "address": "somewhere"
+        }
+
+        account.deserialize(data)
+
+        self.assertEqual(account.name, "Bob")
+        self.assertIsNotNone(account.date_joined)
+
+    def test_deserialize_type_error(self):
+        """It should raise DataValidationError for bad data"""
+        from service.models import DataValidationError
+
+        account = Account()
+
+        with self.assertRaises(DataValidationError):
+            account.deserialize(None)
+
+    def test_find_by_name(self):
+        """It should find accounts by name"""
+        accounts = self._create_accounts(3)
+
+        name = accounts[0].name
+
+        results = Account.find_by_name(name).all()
+
+        self.assertGreaterEqual(len(results), 1)
+        self.assertEqual(results[0].name, name)
+
+    def test_cors_headers(self):
+        """It should return CORS headers"""
+        resp = self.client.get("/", environ_overrides=HTTPS_ENVIRON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        self.assertEqual(resp.headers.get("Access-Control-Allow-Origin"), "*")
