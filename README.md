@@ -1,5 +1,9 @@
 # devops-capstone-project
 
+![Build Status](https://github.com/Aviral3501/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
+
+# Customer Accounts microservice 
+
 ## Overview
 
 The **DevOps Capstone Project** demonstrates the application of modern DevOps practices to design, build, test, secure, containerize, and deploy a cloud-native microservice.
