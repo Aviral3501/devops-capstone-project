@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/Aviral3501/devops-capstone-project/actions/workflows/ci-build.yaml/badge.svg)
 
-# Customer Accounts microservice
+# Customer Accounts microservice 
 
 ## Overview
 
