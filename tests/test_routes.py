@@ -190,3 +190,21 @@ class TestAccountService(TestCase):
         resp = self.client.put(f"{BASE_URL}/0", json=account)
 
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_build_database_uri_from_env(self):
+        """It should build DATABASE_URI from environment variables"""
+
+        # Remove DATABASE_URI so the config code runs
+        os.environ.pop("DATABASE_URI", None)
+
+        os.environ["DATABASE_USER"] = "testuser"
+        os.environ["DATABASE_PASSWORD"] = "testpass"
+        os.environ["DATABASE_NAME"] = "testdb"
+        os.environ["DATABASE_HOST"] = "testhost"
+
+        from service import config
+        importlib.reload(config)
+
+        self.assertIn("postgresql://", config.DATABASE_URI)
+        self.assertIn("testuser", config.DATABASE_URI)
+        self.assertIn("testdb", config.DATABASE_URI)
